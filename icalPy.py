@@ -4,37 +4,40 @@
 #* -.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 # File Name : icalPy.py
 # Creation Date : 15-09-2012
-# Last Modified : Fri 12 Oct 2012 03:32:30 PM EEST
+# Last Modified : Sun 11 Nov 2012 12:29:24 PM EET
 # Created By : Greg Liras <gregliras@gmail.com>
 #_._._._._._._._._._._._._._._._._._._._._.*/
 
 from icalendar import Calendar, Event
-from sys import stdin, argv
+from sys import stdin, stderr, argv
+from string import maketrans, translate
 
 def safe_get_na(c, evaluated):
     try:
         a = eval(evaluated)
     except KeyError:
-        a = "NA"
+        a = u"NA"
     return a
 
 def main():
-    cal = Calendar.from_ical(stdin.read())
+    text = stdin.read().decode('utf-8')
+    text = text.encode('utf-8')
+    cal = Calendar.from_ical(text)
     for c in cal.walk():
         if c.name == 'VEVENT':
-            print "Organizer:\t\t", safe_get_na(c, "c['ORGANIZER'][7:]")
-            print "Summary:\t\t", safe_get_na(c, "c['SUMMARY']")
-            print "Attendee(s):"
-            attend = safe_get_na(c, "c['ATTENDEE']")
+            print u"Organizer:\t\t", safe_get_na(c, u"c['ORGANIZER'][7:]")
+            print u"Summary:\t\t", safe_get_na(c, u"c['SUMMARY']").encode('utf-8')
+            print u"Attendee(s):"
+            attend = safe_get_na(c, u"c['ATTENDEE']")
             if type(attend) == list:
                 for a in attend:
-                    print "\t\t\t", a[7:]
+                    print u"\t\t\t", a[7:]
             else:
-                print "\t\t\t", a
-            print "From:\t\t\t", safe_get_na(c, "c['DTSTART'].dt")
-            print "To:\t\t\t", safe_get_na(c, "c['DTEND'].dt")
-            print "Where:\t\t\t", safe_get_na(c, "c['LOCATION']")
-            print "Description:\t\t", safe_get_na(c, "c['DESCRIPTION'].encode('latin-1', 'ignore')")
+                print u"\t\t\t", attend
+            print u"From:\t\t\t", safe_get_na(c, u"c['DTSTART'].dt")
+            print u"To:\t\t\t", safe_get_na(c, u"c['DTEND'].dt")
+            print u"Where:\t\t\t", safe_get_na(c, u"c['LOCATION']")
+            print u"Description:\t\t", safe_get_na(c, u"c['DESCRIPTION'].encode('latin-1', 'ignore')")
 
 if __name__=="__main__":
     main()
